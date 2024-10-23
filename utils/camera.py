@@ -65,6 +65,7 @@ class VideoCamera:
         # Detect faces in the frame
         detected_faces = face_detector(gray, 1)
 
+        emotion = "No Face Detected"
         for face in detected_faces:
             # Detect facial landmarks
             landmarks = landmark_predictor(gray, face)
@@ -84,10 +85,12 @@ class VideoCamera:
             predicted_emotion = emotion_classifier.predict([geometric_features])[0]
             print(f"Predicted Emotion: {predicted_emotion}")
 
+            emotion = predicted_emotion
+
             # Draw a rectangle around the face and display the emotion on the frame
-            cv2.rectangle(frame, (face.left(), face.top()), (face.right(), face.bottom()), (255, 0, 0), 2)
+            cv2.rectangle(frame, (face.left(), face.top()), (face.right(), face.bottom()), (0, 255, 0), 1)
             cv2.putText(frame, predicted_emotion, (face.left(), face.top() - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
 
         # Encode the frame to be displayed
         ret, jpeg = cv2.imencode('.jpg', frame)
-        return jpeg.tobytes()
+        return jpeg.tobytes(), emotion

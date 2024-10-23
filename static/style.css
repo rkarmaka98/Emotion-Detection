@@ -1,0 +1,63 @@
+/* General Page Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.container {
+    padding-top: 50px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.description {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.video-container {
+    position: relative;
+    display: inline-block;
+}
+
+#video-feed {
+    border: 3px solid #ccc;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.emotion-label {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    opacity: 0;  /* Hidden by default */
+}
+
+.emotion-change {
+    opacity: 1; /* Visible during animation */
+    background-color: #4CAF50;  /* Green background for the animation */
+    transition: opacity 1s ease;  /* Animation duration */
+}
+
+footer {
+    margin-top: 30px;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+footer p {
+    margin: 0;
+}
