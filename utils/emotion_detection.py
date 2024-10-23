@@ -15,18 +15,32 @@ print("Shape predictor and face detector loaded successfully.")
 # Function to extract geometric features
 def extract_geometric_features(landmarks):
     """Extract geometric features from facial landmarks."""
-    print("Extracting geometric features from landmarks...")
     features = []
     
-    # Example: distance between eyes, width of mouth, etc.
-    eye_distance = np.linalg.norm(np.array(landmarks[36]) - np.array(landmarks[45]))
-    mouth_width = np.linalg.norm(np.array(landmarks[48]) - np.array(landmarks[54]))
+    # Example: distance between key facial landmarks
+    eye_distance = np.linalg.norm(np.array(landmarks[36]) - np.array(landmarks[45]))  # Distance between eyes
+    mouth_width = np.linalg.norm(np.array(landmarks[48]) - np.array(landmarks[54]))   # Width of the mouth
+    nose_to_mouth = np.linalg.norm(np.array(landmarks[33]) - np.array(landmarks[51]))  # Nose to mouth
     
-    features.append(eye_distance)
-    features.append(mouth_width)
+    # Example: distances between eyebrows and eyes
+    left_eyebrow_to_eye = np.linalg.norm(np.array(landmarks[21]) - np.array(landmarks[39]))  # Left eyebrow to left eye
+    right_eyebrow_to_eye = np.linalg.norm(np.array(landmarks[22]) - np.array(landmarks[42]))  # Right eyebrow to right eye
+
+    # Example: other facial distances
+    chin_to_left_eye = np.linalg.norm(np.array(landmarks[8]) - np.array(landmarks[36]))  # Chin to left eye
+    chin_to_right_eye = np.linalg.norm(np.array(landmarks[8]) - np.array(landmarks[45]))  # Chin to right eye
+    mouth_to_left_eye = np.linalg.norm(np.array(landmarks[48]) - np.array(landmarks[36]))  # Mouth to left eye
+    mouth_to_right_eye = np.linalg.norm(np.array(landmarks[54]) - np.array(landmarks[45]))  # Mouth to right eye
+    nose_to_left_eye = np.linalg.norm(np.array(landmarks[33]) - np.array(landmarks[36]))  # Nose to left eye
+
+    # Append the calculated distances to the feature vector
+    features.extend([eye_distance, mouth_width, nose_to_mouth,
+                     left_eyebrow_to_eye, right_eyebrow_to_eye,
+                     chin_to_left_eye, chin_to_right_eye,
+                     mouth_to_left_eye, mouth_to_right_eye, nose_to_left_eye])
     
-    print(f"Features extracted: eye_distance={eye_distance}, mouth_width={mouth_width}")
     return np.array(features)
+
 
 # Define the path to your dataset
 dataset_dir = 'data/FER2013/train/'  # Assuming you have organized your dataset into 'train' and 'test'

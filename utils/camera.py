@@ -17,14 +17,31 @@ def extract_geometric_features(landmarks):
     """Extract geometric features from facial landmarks."""
     features = []
     
-    # Example: distance between eyes, width of mouth, etc.
-    eye_distance = np.linalg.norm(np.array(landmarks[36]) - np.array(landmarks[45]))
-    mouth_width = np.linalg.norm(np.array(landmarks[48]) - np.array(landmarks[54]))
+    # Example: distance between key facial landmarks
+    eye_distance = np.linalg.norm(np.array(landmarks[36]) - np.array(landmarks[45]))  # Distance between eyes
+    mouth_width = np.linalg.norm(np.array(landmarks[48]) - np.array(landmarks[54]))   # Width of the mouth
+    nose_to_mouth = np.linalg.norm(np.array(landmarks[33]) - np.array(landmarks[51]))  # Nose to mouth
     
-    features.append(eye_distance)
-    features.append(mouth_width)
+    # Example: distances between eyebrows and eyes
+    left_eyebrow_to_eye = np.linalg.norm(np.array(landmarks[21]) - np.array(landmarks[39]))  # Left eyebrow to left eye
+    right_eyebrow_to_eye = np.linalg.norm(np.array(landmarks[22]) - np.array(landmarks[42]))  # Right eyebrow to right eye
+
+    # Example: other facial distances
+    chin_to_left_eye = np.linalg.norm(np.array(landmarks[8]) - np.array(landmarks[36]))  # Chin to left eye
+    chin_to_right_eye = np.linalg.norm(np.array(landmarks[8]) - np.array(landmarks[45]))  # Chin to right eye
+    mouth_to_left_eye = np.linalg.norm(np.array(landmarks[48]) - np.array(landmarks[36]))  # Mouth to left eye
+    mouth_to_right_eye = np.linalg.norm(np.array(landmarks[54]) - np.array(landmarks[45]))  # Mouth to right eye
+    nose_to_left_eye = np.linalg.norm(np.array(landmarks[33]) - np.array(landmarks[36]))  # Nose to left eye
+
+    # Append the calculated distances to the feature vector
+    features.extend([eye_distance, mouth_width, nose_to_mouth,
+                     left_eyebrow_to_eye, right_eyebrow_to_eye,
+                     chin_to_left_eye, chin_to_right_eye,
+                     mouth_to_left_eye, mouth_to_right_eye, nose_to_left_eye])
     
     return np.array(features)
+
+
 
 # Video stream capture class
 class VideoCamera:
@@ -33,11 +50,9 @@ class VideoCamera:
         self.video = cv2.VideoCapture(0)
 
     def __del__(self):
-        # Release the video capture when done
         self.video.release()
 
     def get_frame(self):
-        """Capture a frame from the video stream, process it, and return the result with emotion predictions."""
         ret, frame = self.video.read()
 
         if not ret:
@@ -51,15 +66,22 @@ class VideoCamera:
         detected_faces = face_detector(gray, 1)
 
         for face in detected_faces:
-            # Extract landmarks
+            # Detect facial landmarks
             landmarks = landmark_predictor(gray, face)
             landmark_points = [(landmarks.part(i).x, landmarks.part(i).y) for i in range(68)]
 
-            # Extract geometric features
-            features = extract_geometric_features(landmark_points)
+            # Extract geometric features (10 features)
+            geometric_features = extract_geometric_features(landmark_points)
 
-            # Predict emotion using the pre-trained model
-            predicted_emotion = emotion_classifier.predict([features])[0]
+            # Crop the face region and ensure it's valid
+            face_image = gray[face.top():face.bottom(), face.left():face.right()]
+            if face_image.size == 0:
+                print("Warning: Face region is empty or invalid.")
+                continue
+
+
+            # Predict emotion using the pre-trained SVM classifier
+            predicted_emotion = emotion_classifier.predict([geometric_features])[0]
             print(f"Predicted Emotion: {predicted_emotion}")
 
             # Draw a rectangle around the face and display the emotion on the frame
@@ -69,4 +91,3 @@ class VideoCamera:
         # Encode the frame to be displayed
         ret, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes()
-
